@@ -11,6 +11,9 @@ const orgCreateStmt = `INSERT INTO organizations (created, updated, name,
 email, type, address, location, password) VALUES ($1, $2, $3, $4, $5, $6,
 point($7, $8), $9) RETURNING id`
 
+const orgGetByID = `SELECT id, created, updated, name, email, type,
+address, location, password FROM organizations WHERE id = $1`
+
 const orgGetByEmail = `SELECT id, created, updated, name, email, type,
 address, location, password FROM organizations WHERE email ilike $1`
 
@@ -40,6 +43,16 @@ func SaveOrganization(o *model.Organization) error {
 	}
 
 	return nil
+}
+
+func GetOrganizationByID(id int64) (*model.Organization, error) {
+	o := model.Organization{}
+	row := db.QueryRow(orgGetByID, id)
+	if err := row.Scan(&o.ID, &o.Created, &o.Updated, &o.Name, &o.Email, &o.Type,
+		&o.Address, &o.Location, &o.Password); err != nil {
+		return nil, err
+	}
+	return &o, nil
 }
 
 func GetOrganizationByEmail(email string) (*model.Organization, error) {

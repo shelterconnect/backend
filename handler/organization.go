@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"database/sql"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/zachlatta/shelterconnect/database"
 	"github.com/zachlatta/shelterconnect/model"
 )
@@ -19,6 +22,50 @@ func CreateOrganization(w http.ResponseWriter, r *http.Request,
 	if err != nil {
 		if err == model.ErrInvalidOrganizationEmail {
 			return ErrCreatingModel(err)
+		}
+		return ErrDatabase(err)
+	}
+
+	return renderJSON(w, org, http.StatusOK)
+}
+
+func GetOrganization(w http.ResponseWriter, r *http.Request,
+	o *model.Organization) *AppError {
+	vars := mux.Vars(r)
+	stringID := vars["id"]
+
+	var (
+		id      int64
+		isEmail bool
+	)
+	if stringID == "me" {
+		if o == nil {
+			return ErrUnauthorized()
+		}
+
+		id = o.ID
+	} else if model.RegexpEmail.MatchString(stringID) {
+		isEmail = true
+	} else {
+		var err error
+		id, err = strconv.ParseInt(stringID, 10, 64)
+		if err != nil {
+			return ErrInvalidID(err)
+		}
+	}
+
+	var (
+		org *model.Organization
+		err error
+	)
+	if isEmail {
+		org, err = database.GetOrganizationByEmail(stringID)
+	} else {
+		org, err = database.GetOrganizationByID(id)
+	}
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return ErrNotFound(err)
 		}
 		return ErrDatabase(err)
 	}

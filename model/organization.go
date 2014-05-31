@@ -31,7 +31,7 @@ var (
 	ErrInvalidOrganizationPassword = errors.New("invalid password")
 )
 
-var regexpEmail = regexp.MustCompile(`^[^@]+@[^@.]+\.[^@.]+`)
+var RegexpEmail = regexp.MustCompile(`^[^@]+@[^@.]+\.[^@.]+`)
 
 type Organization struct {
 	ID       int64            `json:"id"`
@@ -95,7 +95,7 @@ func (o *RequestOrganization) validate() error {
 	switch {
 	case len(o.Name) == 0 || len(o.Name) > 255:
 		return ErrInvalidOrganizationName
-	case regexpEmail.MatchString(o.Email) == false:
+	case RegexpEmail.MatchString(o.Email) == false:
 		return ErrInvalidOrganizationEmail
 	case o.Type < OrganizationShelter || o.Type > OrganizationChurch:
 		return ErrInvalidOrganizationType

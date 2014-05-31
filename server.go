@@ -39,6 +39,8 @@ func main() {
 		handler.AppHandler(handler.CreateOrganization)).Methods("POST")
 	r.Handle("/organizations",
 		handler.AppHandler(handler.GetAllOrganizations)).Methods("GET")
+	r.Handle("/organizations/{id}",
+		handler.AppHandler(handler.GetOrganization)).Methods("GET")
 
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
