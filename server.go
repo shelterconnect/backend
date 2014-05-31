@@ -43,5 +43,5 @@ func main() {
 		handler.AppHandler(handler.GetOrganization)).Methods("GET")
 
 	http.Handle("/", r)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, httpLog(http.DefaultServeMux)))
 }
