@@ -5,7 +5,7 @@ CREATE TABLE organizations (
   created timestamp not null,
   updated timestamp not null,
   name text not null,
-  email text not null,
+  email text not null unique,
   type integer not null,
   address text not null,
   location point not null,
