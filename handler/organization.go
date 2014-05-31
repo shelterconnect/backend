@@ -25,3 +25,13 @@ func CreateOrganization(w http.ResponseWriter, r *http.Request,
 
 	return renderJSON(w, org, http.StatusOK)
 }
+
+func GetAllOrganizations(w http.ResponseWriter, r *http.Request,
+	_ *model.Organization) *AppError {
+	orgs, err := database.GetAllOrganizations()
+	if err != nil {
+		return ErrDatabase(err)
+	}
+
+	return renderJSON(w, orgs, http.StatusOK)
+}
