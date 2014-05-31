@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"regexp"
+	"time"
 
 	"github.com/kellydunn/golang-geo"
 
@@ -34,11 +35,13 @@ var regexpEmail = regexp.MustCompile(`^[^@]+@[^@.]+\.[^@.]+`)
 
 type Organization struct {
 	ID       int64            `json:"id"`
+	Created  time.Time        `json:"created"`
+	Updated  time.Time        `json:"updated"`
 	Name     string           `json:"name"`
 	Email    string           `json:"email"`
 	Type     organizationType `json:"type"`
 	Address  string           `json:"address"`
-	Location *location        `json:"location"`
+	Location location         `json:"location"`
 	Password string           `json:"-"`
 }
 
@@ -78,7 +81,7 @@ func NewOrganization(jsonReader io.Reader) (*Organization, error) {
 		Email:   rO.Email,
 		Type:    rO.Type,
 		Address: rO.Address,
-		Location: &location{
+		Location: location{
 			Latitude:  point.Lat(),
 			Longitude: point.Lng(),
 		},
