@@ -8,6 +8,6 @@ ENV PATH /go/bin:$PATH
 RUN go get github.com/codegangsta/gin
 RUN go get bitbucket.org/liamstask/goose/cmd/goose
 
-WORKDIR /go/src/github.com/shelterconnect/backend
-ADD . /go/src/github.com/shelterconnect/backend
+WORKDIR /go/src/github.com/zachlatta/shelterconnect
+ADD . /go/src/github.com/zachlatta/shelterconnect
 RUN go get

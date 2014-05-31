@@ -33,14 +33,13 @@ var (
 var regexpEmail = regexp.MustCompile(`^[^@]+@[^@.]+\.[^@.]+`)
 
 type Organization struct {
-	ID        int64            `json:"id"`
-	Name      string           `json:"name"`
-	Email     string           `json:"email"`
-	Type      organizationType `json:"type"`
-	Address   string           `json:"address"`
-	Latitude  float64          `json:"latitude"`
-	Longitude float64          `json:"longitude"`
-	Password  string           `json:"-"`
+	ID       int64            `json:"id"`
+	Name     string           `json:"name"`
+	Email    string           `json:"email"`
+	Type     organizationType `json:"type"`
+	Address  string           `json:"address"`
+	Location *location        `json:"location"`
+	Password string           `json:"-"`
 }
 
 type RequestOrganization struct {
@@ -75,13 +74,15 @@ func NewOrganization(jsonReader io.Reader) (*Organization, error) {
 	}
 
 	org := Organization{
-		Name:      rO.Name,
-		Email:     rO.Email,
-		Type:      rO.Type,
-		Address:   rO.Address,
-		Latitude:  point.Lat(),
-		Longitude: point.Lng(),
-		Password:  string(b),
+		Name:    rO.Name,
+		Email:   rO.Email,
+		Type:    rO.Type,
+		Address: rO.Address,
+		Location: &location{
+			Latitude:  point.Lat(),
+			Longitude: point.Lng(),
+		},
+		Password: string(b),
 	}
 
 	return &org, nil
