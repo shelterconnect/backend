@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
 
+	"github.com/dgrijalva/jwt-go"
+	"github.com/zachlatta/shelterconnect/database"
 	"github.com/zachlatta/shelterconnect/model"
 )
 
@@ -42,28 +45,28 @@ func (fn AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserFromToken(r *http.Request) (*model.Organization, *AppError) {
-	//token, err := jwt.ParseFromRequest(r, func(t *jwt.Token) ([]byte, error) {
-	//// TODO: Use real secret
-	//return []byte("secret"), nil
-	//})
-	//if err != nil {
-	//return nil, &AppError{err, "bad authorization token",
-	//http.StatusBadRequest}
-	//}
+	token, err := jwt.ParseFromRequest(r, func(t *jwt.Token) ([]byte, error) {
+		// TODO: Use real secret
+		return []byte("secret"), nil
+	})
+	if err != nil {
+		return nil, &AppError{err, "bad authorization token",
+			http.StatusBadRequest}
+	}
 
-	//userID := int64(token.Claims["id"].(float64))
+	id := int64(token.Claims["id"].(float64))
 
-	//user, err := database.GetUser(userID)
-	//if err != nil {
-	//if err == sql.ErrNoRows {
-	//return nil, &AppError{err, "user from token not found",
-	//http.StatusNotFound}
-	//}
-	//return nil, &AppError{err, "error fetching user from database",
-	//http.StatusInternalServerError}
-	//}
+	org, err := database.GetOrganizationByID(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, &AppError{err, "user from token not found",
+				http.StatusNotFound}
+		}
+		return nil, &AppError{err, "error fetching user from database",
+			http.StatusInternalServerError}
+	}
 
-	return nil, nil
+	return org, nil
 }
 
 func renderJSON(w http.ResponseWriter, data interface{}, code int) *AppError {
