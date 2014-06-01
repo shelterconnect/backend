@@ -80,10 +80,11 @@ func NewOrganization(jsonReader io.Reader) (*Organization, error) {
 	}
 
 	org := Organization{
-		Name:    rO.Name,
-		Email:   rO.Email,
-		Type:    rO.Type,
-		Address: rO.Address,
+		Name:        rO.Name,
+		Description: rO.Description,
+		Email:       rO.Email,
+		Type:        rO.Type,
+		Address:     rO.Address,
 		Location: location{
 			Latitude:  point.Lat(),
 			Longitude: point.Lng(),
