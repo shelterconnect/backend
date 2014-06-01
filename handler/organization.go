@@ -2,8 +2,11 @@ package handler
 
 import (
 	"database/sql"
+	"encoding/json"
 	"net/http"
 	"strconv"
+
+	"code.google.com/p/go.crypto/bcrypt"
 
 	"github.com/gorilla/mux"
 	"github.com/zachlatta/shelterconnect/database"
@@ -81,4 +84,38 @@ func GetAllOrganizations(w http.ResponseWriter, r *http.Request,
 	}
 
 	return renderJSON(w, orgs, http.StatusOK)
+}
+
+func AuthenticateOrganization(w http.ResponseWriter, r *http.Request,
+	_ *model.Organization) *AppError {
+	var requestOrg *model.RequestOrganization
+	defer r.Body.Close()
+	err := json.NewDecoder(r.Body).Decode(&requestOrg)
+	if err != nil {
+		return ErrUnmarshalling(err)
+	}
+
+	orgFromDB, err := database.GetOrganizationByEmail(requestOrg.Email)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return ErrNotFound(err)
+		}
+		return ErrDatabase(err)
+	}
+
+	err = orgFromDB.ComparePassword(requestOrg.Password)
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		return &AppError{err, "invalid password", http.StatusBadRequest}
+	} else if err != nil {
+		return &AppError{err, "error checking password",
+			http.StatusInternalServerError}
+	}
+
+	token, err := model.NewToken(orgFromDB)
+	if err != nil {
+		return &AppError{err, "problem creating jwt token",
+			http.StatusInternalServerError}
+	}
+
+	return renderJSON(w, token, http.StatusOK)
 }

@@ -25,3 +25,7 @@ func ErrUnauthorized() *AppError {
 	err := errors.New("unauthorized")
 	return &AppError{err, err.Error(), http.StatusUnauthorized}
 }
+
+func ErrUnmarshalling(err error) *AppError {
+	return &AppError{err, err.Error(), http.StatusBadRequest}
+}

@@ -107,3 +107,9 @@ func (o *RequestOrganization) validate() error {
 		return nil
 	}
 }
+
+// ComparePassword compares the supplied password to the user password stored
+// in the database.
+func (o *Organization) ComparePassword(password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(o.Password), []byte(password))
+}

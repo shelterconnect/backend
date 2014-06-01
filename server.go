@@ -41,6 +41,8 @@ func main() {
 		handler.AppHandler(handler.GetAllOrganizations)).Methods("GET")
 	r.Handle("/organizations/{id}",
 		handler.AppHandler(handler.GetOrganization)).Methods("GET")
+	r.Handle("/organizations/authenticate",
+		handler.AppHandler(handler.AuthenticateOrganization)).Methods("POST")
 
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(":"+port, httpLog(http.DefaultServeMux)))
