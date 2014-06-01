@@ -24,33 +24,36 @@ const (
 var geocoder = geo.GoogleGeocoder{}
 
 var (
-	ErrInvalidOrganizationName     = errors.New("invalid name")
-	ErrInvalidOrganizationEmail    = errors.New("invalid email")
-	ErrInvalidOrganizationType     = errors.New("invalid type")
-	ErrInvalidOrganizationAddress  = errors.New("invalid address")
-	ErrInvalidOrganizationPassword = errors.New("invalid password")
+	ErrInvalidOrganizationName        = errors.New("invalid name")
+	ErrInvalidOrganizationDescription = errors.New("invalid description")
+	ErrInvalidOrganizationEmail       = errors.New("invalid email")
+	ErrInvalidOrganizationType        = errors.New("invalid type")
+	ErrInvalidOrganizationAddress     = errors.New("invalid address")
+	ErrInvalidOrganizationPassword    = errors.New("invalid password")
 )
 
 var RegexpEmail = regexp.MustCompile(`^[^@]+@[^@.]+\.[^@.]+`)
 
 type Organization struct {
-	ID       int64            `json:"id"`
-	Created  time.Time        `json:"created"`
-	Updated  time.Time        `json:"updated"`
-	Name     string           `json:"name"`
-	Email    string           `json:"email"`
-	Type     organizationType `json:"type"`
-	Address  string           `json:"address"`
-	Location location         `json:"location"`
-	Password string           `json:"-"`
+	ID          int64            `json:"id"`
+	Created     time.Time        `json:"created"`
+	Updated     time.Time        `json:"updated"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	Email       string           `json:"email"`
+	Type        organizationType `json:"type"`
+	Address     string           `json:"address"`
+	Location    location         `json:"location"`
+	Password    string           `json:"-"`
 }
 
 type RequestOrganization struct {
-	Name     string           `json:"name"`
-	Email    string           `json:"email"`
-	Type     organizationType `json:"type"`
-	Address  string           `json:"address"`
-	Password string           `json:"password"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	Email       string           `json:"email"`
+	Type        organizationType `json:"type"`
+	Address     string           `json:"address"`
+	Password    string           `json:"password"`
 }
 
 func NewOrganization(jsonReader io.Reader) (*Organization, error) {
@@ -94,6 +97,8 @@ func NewOrganization(jsonReader io.Reader) (*Organization, error) {
 func (o *RequestOrganization) validate() error {
 	switch {
 	case len(o.Name) == 0 || len(o.Name) > 255:
+		return ErrInvalidOrganizationName
+	case len(o.Description) == 0 || len(o.Description) > 4096:
 		return ErrInvalidOrganizationName
 	case RegexpEmail.MatchString(o.Email) == false:
 		return ErrInvalidOrganizationEmail
